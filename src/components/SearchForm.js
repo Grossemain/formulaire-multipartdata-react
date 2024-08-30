@@ -1,74 +1,98 @@
-import Button from "react-bootstrap/Button";
-import Container from "react-bootstrap/Container";
-import {Form, Row, Col } from "react-bootstrap/";
 import React, { useState } from "react";
-import ResultatCard from './ResultatCard';
+import { Container, Form, Button, Row, Col, InputGroup } from "react-bootstrap";
 
-
-function SearchForm() {
+function SearchForm({onFormSubmit}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [submitSearch, setSubmitSearch] = useState(""); // Nouvelle variable d'état
+  const [city, setCity] = useState("");
+  const [departement, setDepartement] = useState("");
+
+
 
   const handleInputChange = (event) => {
     setSearchQuery(event.target.value);
   };
-  console.log(results.values);
+
+  const handleChangeCity = (event) => {
+    setCity(event.target.value);
+    console.log("city"+city);
+  };
+
+  const handleChangeDepartement = (event) => {
+    setDepartement(event.target.value);
+    console.log("departement"+departement);
+  };
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
 
-    // Mettre à jour l'état hasSearched à vrai pour indiquer qu'une recherche a été effectuée
     setHasSearched(true);
+    setSubmitSearch(searchQuery); // Mettre à jour submitSearch avec la valeur de searchQuery
 
-    // Renseigner l'url de l'api
     const apiUrl = `https://geo.api.gouv.fr/communes?codePostal=${searchQuery}&fields=nom,departement`;
-    console.log(results);
+
     try {
       const response = await fetch(apiUrl, {
-        mode: 'no-cors',
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
-        // body: JSON.stringify({ search: searchQuery }),
       });
 
       const data = await response.json();
+      console.log("test",data);
       setResults(data);
+      onFormSubmit({ searchQuery, city, departement });
     } catch (error) {
       console.error("Erreur lors de la recherche:", error);
     }
   };
 
   return (
-    <Container fluid>
-      <Form className="d-flex" onSubmit={handleFormSubmit}>
-        <Form.Control
-          type="text"
-          value={searchQuery}
-          onChange={handleInputChange}
-          placeholder="Code Postal"
-        />
-        <Button type="submit">Chercher</Button>
+    <Container>
+      <Form>
+        <Row>
+          <Col>
+            <InputGroup>
+              <Form.Control
+                type="text"
+                placeholder="Entrez le code postal"
+                value={searchQuery}
+                onChange={handleInputChange}
+              />
+              <Button type="button" onClick={handleFormSubmit}>Rechercher</Button>
+            </InputGroup>
+          </Col>
+        </Row>
       </Form>
-      <section className="Resultat">
-        <Container fluid="md">
-          <Row>
-            <Col>
-              {results.length > 0 ? (
-                <div className= "row row-cols-1 row-cols-md-3 g-4 m-3 rounded-3 mt-4">
-                  {results.map((city, index) => (
-                    <ResultatCard key={index} city={city}/>
-                  ))}
-                </div>
-              ) : (
-                hasSearched && <p>Aucun résultat trouvé</p>
-              )}
-            </Col>
-          </Row>
-        </Container>
-      </section>
+
+      {hasSearched && (
+
+        
+        <Form.Group as={Row} className="mt-3">
+          <Form.Label column sm="2">Sélectionnez une commune</Form.Label>
+          <Col sm="10">
+            <Form.Control as="select" name="city" onChange={handleChangeCity}>
+            <option value="">Sélectionner un élément</option>
+              {results.map((result, index) => ( 
+                <option key={index} value={result.nom}>
+                  {result.nom} 
+                </option>
+              ))}
+            </Form.Control>
+            <Form.Control as="select" name="departement" onChange={handleChangeDepartement}>
+            <option value="">Sélectionner un élément</option>
+              {results.map((result, index) => (
+                <option key={index} value={result.departement.nom}>
+                  {result.departement.nom}
+                </option>
+              ))}
+            </Form.Control>
+          </Col>
+        </Form.Group>
+      )}
     </Container>
   );
 }

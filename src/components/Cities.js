@@ -4,6 +4,7 @@ import { Form } from "react-bootstrap";
 
 const Cities = () => {
   const [citiesData, setCitiesData] = useState([]);
+
   const flag = useRef(false);
 
   useEffect(() => {

@@ -1,13 +1,12 @@
 import React, { Component } from 'react'
-import Departements from './components/Departements';
-// import SearchFormRachid from './components/SearchFormRachid';
+import SearchForm from './components/SearchForm'
 
 export class Merci extends Component {
 render() {
 return (
 <div>
 Merci ! 
-{/* <SearchFormRachid/> */}
+<SearchForm/>
 </div>
 )
 }

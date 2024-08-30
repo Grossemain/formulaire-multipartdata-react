@@ -5,7 +5,7 @@ import AxiosApiGeo from "./apigeo.service";
  * @returns {Promise}
  */
 let getCity = () => {
-  return AxiosApiGeo.get("/communes?codePostal=44400&fields=nom,departement");
+  return AxiosApiGeo.get("/communes?codePostal=44400&fields=nom,code,codesPostaux");
 };
 
 /**
